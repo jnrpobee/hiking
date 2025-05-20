@@ -1201,8 +1201,7 @@ mapping = {
     'Strongly agree': 5, # 5 for strongly agree
 }
 print ("\nreplacement of like to hike in group to numeric value...")
-df['like_to_hike_in_group_num'] = df['like_to_hike_in_group'].replace(mapping)
-df['like_to_hike_in_group_num'] = df['like_to_hike_in_group_num'].infer_objects(copy=False)  # suppress FutureWarning
+df['like_to_hike_in_group_num'] = df['like_to_hike_in_group'].replace(mapping).infer_objects(copy=False)
 df['like_to_hike_in_group_num'] = df['like_to_hike_in_group_num'].astype(int)
 print ("Done\n")
 #exclude the rows with fill in the blank
@@ -1389,8 +1388,7 @@ mapping = {
     'Strongly agree': 5, # 5 for strongly agree
 }
 print ("\nreplacement of hike for health to numeric value...")
-df['hike_for_health_num'] = df['hike_for_health'].replace(mapping)
-df['hike_for_health_num'] = df['hike_for_health_num'].infer_objects(copy=False)
+df['hike_for_health_num'] = df['hike_for_health'].replace(mapping).infer_objects(copy=False)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_health_num'])
 
@@ -1548,7 +1546,7 @@ mapping = {
     'Strongly agree': 5, # 5 for strongly agree
 }
 print ("\nreplacement of hike for fun to numeric value...")
-df['hike_for_fun_num'] = df['hike_for_fun'].replace(mapping)
+df['hike_for_fun_num'] = df['hike_for_fun'].replace(mapping).infer_objects(copy=False)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_fun_num'])
 
@@ -1612,7 +1610,7 @@ mapping = {
     'Strongly agree': 5, # 5 for strongly agree
 }
 print ("\nreplacement of hike for meditation to numeric value...")
-df['hike_for_meditation_num'] = df['hike_for_mediation'].replace(mapping)
+df['hike_for_meditation_num'] = df['hike_for_mediation'].replace(mapping).infer_objects(copy=False)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_meditation_num'])
 
@@ -1676,7 +1674,7 @@ mapping = {
     'Strongly agree': 5, # 5 for strongly agree
 }
 print ("\nreplacement of hike for less than 1 hour to numeric value...")
-df['hike_for_less_than_1hour_num'] = df['hike_for_less_than_1hour'].replace(mapping)
+df['hike_for_less_than_1hour_num'] = df['hike_for_less_than_1hour'].replace(mapping).infer_objects(copy=False)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_less_than_1hour_num'])
 
@@ -1738,7 +1736,7 @@ mapping = {
     'Strongly agree': 5, # 5 for strongly agree
 }
 print ("\nreplacement of hike for half a day to numeric value...")
-df['hike_for_half_a_day_num'] = df['hike_for_half_a_day'].replace(mapping)
+df['hike_for_half_a_day_num'] = df['hike_for_half_a_day'].replace(mapping).infer_objects(copy=False)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_half_a_day_num'])
 
@@ -1798,7 +1796,7 @@ mapping = {
     'Strongly agree': 5, # 5 for strongly agree
 }
 print ("\nreplacement of hike for less than a day to numeric value...")
-df['hike_for_less_than_a_day_num'] = df['hike_for_less_than_a_day'].replace(mapping)
+df['hike_for_less_than_a_day_num'] = df['hike_for_less_than_a_day'].replace(mapping).infer_objects(copy=False)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_less_than_a_day_num'])
 
@@ -1861,7 +1859,7 @@ mapping = {
     'Strongly agree': 5, # 5 for strongly agree
 }
 print ("\nreplacement of hike for multiple days to numeric value...")
-df['hike_for_multiple_days_num'] = df['hike_for_multiple_days'].replace(mapping)
+df['hike_for_multiple_days_num'] = df['hike_for_multiple_days'].replace(mapping).infer_objects(copy=False)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_multiple_days_num'])
 
@@ -1950,7 +1948,7 @@ mapping = {
     'Strongly agree': 5,
 }
 if 'difficult_hike_n' not in df.columns:
-    df['difficult_hike_n'] = df['difficult_hike'].replace(mapping)
+    df['difficult_hike_n'] = df['difficult_hike'].replace(mapping).infer_objects(copy=False)
     df['difficult_hike_n'] = df['difficult_hike_n'].fillna(0).astype(int)
     df_valid_gender = df[df['Gender'] != 'Fill in the blank']
 
