@@ -582,6 +582,10 @@ display(residuals)
 # Count the number of devices in the number_of_devices column
 print('\n-----------------device counts--------------------')
 device_counts = df['number _of_devices'].value_counts()
+# Ensure 0 is included in the index, even if not present in the data
+if 0 not in device_counts.index:
+    device_counts.loc[0] = 0
+device_counts = device_counts.sort_index()
 display(device_counts, '\n')
 # Sort the device counts in ascending order
 device_counts = device_counts.sort_index()
