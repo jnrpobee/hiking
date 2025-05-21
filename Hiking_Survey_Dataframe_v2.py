@@ -56,6 +56,12 @@ plt.xticks([])
 plt.show()
 
 
+print( '-----------------app counts in percentage------------------')
+# Convert the app_counts_per_column to percentage (app_counts_per_column / number of respondants * 100)
+app_counts_percentage = total_app_counts_per_row / len(df) * 100
+app_counts_percentage = app_counts_percentage.round(1).astype(str) + '%'
+display(app_counts_percentage)
+
 print("---------------- end of apps -----------\n\n")
 print("---------------- start of device combination -----------\n\n")
 
@@ -265,6 +271,15 @@ device_counts = df[devices_df.columns].stack().value_counts()
 print('\n-----------------device counts------------------')
 display(device_counts)
 
+print('-----------------device counts in percentage------------------')
+
+#convert the device_counts to percentage (device_counts / number of respondants * 100)
+device_counts_percentage = device_counts / len(df) * 100
+device_counts_percentage = device_counts_percentage.round(1).astype(str) + '%'
+device_counts_percentage = device_counts_percentage.to_frame().rename(columns={0: 'Percentage'})
+device_counts_percentage['Count'] = device_counts
+display(device_counts_percentage)
+
 
 
 # device_counts = df[['Device 0', 'Device 1', 'Device 2', 'Device 3', 'Device 4', 'Device 5', 'Device 6', 'Device 7', 'Device 8', 'Device 9']].apply(pd.Series.value_counts)
@@ -282,7 +297,7 @@ top_devices = device_counts.nlargest(4)
 table = pd.DataFrame({'Device': top_devices.index, 'Count': top_devices.values})
 
 # Display the table
-display('\n-----------------device counts------------------', table)
+# display('\n-----------------device counts------------------', table)
 
 # Get the top 4 most common devices
 top_devices = device_counts.nlargest(13)
@@ -333,25 +348,25 @@ plt.show()
 table = pd.DataFrame({'Device': top_devices.index, 'Count': top_devices.values})
 
 # Display the table
-display(table)
+# display(table)
 
-# Get the top 4 most common devices
-top_devices = device_counts.nlargest(13)
+# # Get the top 4 most common devices
+# top_devices = device_counts.nlargest(13)
 
-# Create a bar graph
-colors = plt.cm.tab20(range(len(top_devices)))
-top_devices.plot(kind='bar', color=colors)
-plt.xlabel('Devices')
-plt.ylabel('Device Count')
-plt.title('Common Devices')
-labels = top_devices.index
-legend_patches = [plt.Rectangle((0,0),1,1,fc=color, edgecolor='none') for color in colors]
-plt.legend(legend_patches, top_devices.index, loc='upper center', bbox_to_anchor=(0.5, -0.3), ncol=2)
-# Add data labels to the bars
-for p in plt.gca().patches:
-    plt.text(p.get_x() + p.get_width()/2, p.get_height() * 1.005, '{}'.format(p.get_height()), ha='center', fontsize=11, color='black')
-plt.xticks([])
-plt.show()
+# # Create a bar graph
+# colors = plt.cm.tab20(range(len(top_devices)))
+# top_devices.plot(kind='bar', color=colors)
+# plt.xlabel('Devices')
+# plt.ylabel('Device Count')
+# plt.title('Common Devices')
+# labels = top_devices.index
+# legend_patches = [plt.Rectangle((0,0),1,1,fc=color, edgecolor='none') for color in colors]
+# plt.legend(legend_patches, top_devices.index, loc='upper center', bbox_to_anchor=(0.5, -0.3), ncol=2)
+# # Add data labels to the bars
+# for p in plt.gca().patches:
+#     plt.text(p.get_x() + p.get_width()/2, p.get_height() * 1.005, '{}'.format(p.get_height()), ha='center', fontsize=11, color='black')
+# plt.xticks([])
+# plt.show()
 
 #---- 2 devices testing on the data set ----#
 
@@ -359,7 +374,7 @@ plt.show()
 device_2_counts = df['Device1'].value_counts()
 
 # Display the counts
-display(device_2_counts)
+print(device_2_counts)
 
 # Create a bar graph of the counts in the 'Device 2' column
 device_2_colors = [colors[top_devices.index.get_loc(device)] if device in top_devices.index else 'grey' for device in device_2_counts.index]
@@ -378,7 +393,7 @@ plt.show()
 #-----------2 devices testing on the data set-----------------#
 print('\n2 devices\n')
 df_2_devices = df['2devices'].value_counts().to_frame().T
-display(df_2_devices)
+print(df_2_devices)
 print('\n')
 
 #create a graph of the 2devices dataframe as a bar graph with the devices as the x-axis and the count as the y-axis
