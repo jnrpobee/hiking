@@ -61,6 +61,8 @@ print( '-----------------app counts in percentage------------------')
 app_counts_percentage = total_app_counts_per_row / len(df) * 100
 app_counts_percentage = app_counts_percentage.round(1).astype(str) + '%'
 display(app_counts_percentage)
+display('len(df)', len(df))
+# display('df', df)
 
 print("---------------- end of apps -----------\n\n")
 print("---------------- start of device combination -----------\n\n")
@@ -279,6 +281,7 @@ device_counts_percentage = device_counts_percentage.round(1).astype(str) + '%'
 device_counts_percentage = device_counts_percentage.to_frame().rename(columns={0: 'Percentage'})
 device_counts_percentage['Count'] = device_counts
 display(device_counts_percentage)
+display('len(df)', len(df))
 
 
 
@@ -704,15 +707,30 @@ display(pivot_table_gender_percentage)
 
 
 
-# create a graph of the pivote_table_gender dataframe as a bar graph with the number of devices as the x-axis and the count as the y-axis
-pivot_table_gender.plot(kind='bar')
+print('-----------------Gender with the number of devices (each row show add up to  100%)------------------')
+# Create a pivot table of the number of devices and the percentage (each row adds up to 100%)
+pivot_table_gender_row_percent = pivot_table_gender.div(pivot_table_gender.sum(axis=1), axis=0) * 100
+pivot_table_gender_row_percent_numeric = pivot_table_gender_row_percent.round(1)  # Numeric version for plotting
+pivot_table_gender_row_percent = pivot_table_gender_row_percent_numeric.astype(str) + '%'
+display(pivot_table_gender_row_percent)
+
+# Create a bar graph of the pivot table of the number of devices and the percentage
+colors = plt.cm.tab20(range(len(pivot_table_gender_row_percent_numeric.columns)))
+ax = pivot_table_gender_row_percent_numeric.T.plot(kind='bar', width=0.8, color=colors)
 plt.xlabel('Number of Devices')
-plt.ylabel('Count')
-plt.title('Number of Devices by Gender')
+plt.ylabel('Percentage')
+plt.title('Percentage of Devices by Gender')
+plt.xticks(rotation=0, ha='center')
 # Add data labels to the bars
-for p in plt.gca().patches:
-    plt.text(p.get_x() * 1.005, p.get_height() * 1.005, '{:.1f}%'.format(p.get_height()), fontsize=8, color='black')
+for p in ax.patches:
+    ax.annotate('{:.1f}%'.format(p.get_height()), (p.get_x() + p.get_width() / 2, p.get_height()), 
+                ha='center', va='bottom', fontsize=7, color='black')
+plt.legend(title='Gender', loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=2)
+plt.tight_layout()
 plt.show()
+
+
+print('-----end of Gender with the number of devices------\n\n')
 
 print('done\n')
 
