@@ -1,4 +1,3 @@
-
 import pandas as pd
 import scipy.stats as stats
 import matplotlib.pyplot as plt
@@ -2760,3 +2759,39 @@ print('done\n')
 
 #save the changes to a new Excel file
 #df.to_excel('data_new.xlsx', index=False)
+
+import seaborn as sns
+
+# Example: Grouped bar chart for 'hike_while_traveling' by Gender
+df_plot = df[df['Gender'].isin(['Male', 'Female'])].copy()
+order = ['Strongly disagree', 'Somewhat disagree', 'Neither agree nor disagree', 'Somewhat agree', 'Strongly agree']
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(
+    data=df_plot,
+    x='Gender',
+    hue='hike_while_traveling',
+    order=['Female', 'Male'],
+    hue_order=order,
+    palette='muted'
+)
+
+# Calculate and annotate percentages
+total_by_gender = df_plot.groupby('Gender').size()
+for p in ax.patches:
+    gender = ax.get_xticklabels()[int(p.get_x() + p.get_width()/2)].get_text()
+    count = int(p.get_height())
+    total = total_by_gender[gender]
+    percent = 100 * count / total if total > 0 else 0
+    if count > 0:
+        ax.annotate(f'{percent:.1f}%', (p.get_x() + p.get_width() / 2, p.get_height()),
+                    ha='center', va='bottom', fontsize=10, color='black')
+
+ax.set_xlabel('Hike While Traveling')
+ax.set_ylabel('Count')
+ax.set_title('Number of People by Hike While Traveling')
+ax.legend(title='', loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=3, frameon=False)
+plt.tight_layout()
+plt.show()
+
+# ...existing code...

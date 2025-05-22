@@ -9,8 +9,6 @@ from statsmodels.stats.multitest import fdrcorrection
 from IPython.display import display
 from scipy.stats import skew, kurtosis
 import matplotlib.patches as mpatches
-
-
 import seaborn as sns
 from skimpy import skim 
 
@@ -41,20 +39,42 @@ display(total_app_counts_per_row)
 top_apps = total_app_counts_per_row.nlargest(13)
 
 # Create a bar graph
+plt.figure(figsize=(8, 4.5))
 colors = plt.cm.tab20(range(len(top_apps)))
-top_apps.plot(kind='bar', color=colors)
+ax = top_apps.plot(kind='bar', color=colors, width=0.95)  # Increase width to reduce distance between bars
 plt.xlabel('Apps')
 plt.ylabel('App Count')
 # plt.title('Frequently Used Apps')
 labels = top_apps.index
 legend_patches = [plt.Rectangle((0,0),1,1,fc=color, edgecolor='none') for color in colors]
-plt.legend(legend_patches, top_apps.index, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=2)  # Adjusted bbox_to_anchor to remove white space
+plt.legend(legend_patches, top_apps.index, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=4)
 # Add data labels to the bars
-for p in plt.gca().patches:
+for p in ax.patches:
     plt.text(p.get_x() + p.get_width()/2, p.get_height() * 1.005, '{}'.format(p.get_height()), ha='center', fontsize=11, color='black')
 plt.xticks([])
 plt.show()
 
+
+print(' ---- trial with seaborn on the apps -----------')
+#create a bar chart of the top 4 apps
+plt.figure(figsize=(10, 6))
+sns.barplot(
+    x=top_apps.index,
+    y=top_apps.values,
+    hue=top_apps.index,  # Assign x variable to hue
+    palette='viridis',
+    legend=False
+)
+plt.xlabel('Apps')
+plt.ylabel('App Count')
+plt.title('Apps')
+for p in plt.gca().patches:
+    plt.text(p.get_x() + p.get_width()/2, p.get_height() * 1.005, '{:.0f}'.format(p.get_height()), ha='center', fontsize=11, color='black')
+plt.xticks(rotation=0)
+plt.tight_layout()
+plt.show()
+
+print('--------end of trial with seaborn on the apps -----------')
 
 print( '-----------------app counts in percentage------------------')
 # Convert the app_counts_per_column to percentage (app_counts_per_column / number of respondants * 100)
@@ -80,8 +100,9 @@ total_device_counts_per_row = device_counts_per_column.sum(axis=1)
 top_devices = total_device_counts_per_row.nlargest(13)
 
 # Create a bar graph
+plt.figure(figsize=(8, 5))
 colors = plt.cm.tab20(range(len(top_devices)))
-top_devices.plot(kind='bar', color=colors)
+top_devices.plot(kind='bar', color=colors, width=0.95)
 plt.xlabel('Devices')
 plt.ylabel('Device Count')
 # plt.title('Frequently Used Devices')
@@ -607,7 +628,6 @@ device_counts = device_counts.sort_index()
 display(device_counts, '\n')
 # Sort the device counts in ascending order
 device_counts = device_counts.sort_index()
-#create a graph of the number of devices in the number_of_devices column as a bar graph with the number of devices as the x-axis and the count as the y-axis
 device_counts.plot(kind='bar')
 plt.xlabel('Number of Devices')
 plt.ylabel('Count')
@@ -618,6 +638,55 @@ plt.xticks(rotation=0, ha='center')
 for p in plt.gca().patches:
     plt.text(p.get_x() + p.get_width()/2, p.get_height() * 1.005, '{}'.format(p.get_height()),ha='center', fontsize=8, color='black')
 plt.show()
+
+
+print('------device counts using palette=tab10---------')
+colors = plt.cm.tab10(range(len(device_counts)))
+device_counts.plot(kind='bar', color=colors, width=0.95)
+plt.xlabel('Number of Devices')
+plt.ylabel('Count')
+# plt.title('Distribution of Devices')
+labels = device_counts.index
+# legend_patches = [plt.Rectangle((0,0),1,1,fc=color, edgecolor='none') for color in colors]
+# plt.legend(legend_patches, device_counts.index, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=2)
+# Add data labels to the bars
+for p in plt.gca().patches:
+    plt.text(p.get_x() + p.get_width()/2, p.get_height() * 1.005, '{:.0f}'.format(p.get_height()), ha='center', fontsize=9, color='black')
+plt.xticks(rotation=0, ha='center')
+plt.tight_layout()
+plt.show()
+print('--------end of device counts using palette=tab10---------')
+
+
+print('--------trial with seaborn on the distribution of devices---------')
+# Create a bar plot using seaborn
+
+# Ensure 0 is included in the number of devices, even if not present in the data
+if 0 not in df['number _of_devices'].unique():
+    df_with_0 = pd.concat([df, pd.DataFrame({'number _of_devices': [0]})], ignore_index=True)
+else:
+    df_with_0 = df
+
+plt.figure(figsize=(8, 5))
+sns.countplot(data=df_with_0, x='number _of_devices', hue='number _of_devices', palette='tab10', legend=False)
+plt.xlabel('Number of Devices')
+plt.ylabel('Count')
+plt.title('Distribution of Devices')
+# Add data labels to the bars (no decimals)
+for p in plt.gca().patches:
+    plt.text(
+        p.get_x() + p.get_width() / 2,
+        p.get_height() * 1.005,
+        '{:.0f}'.format(p.get_height()),
+        ha='center',
+        fontsize=9,
+        color='black'
+    )
+plt.xticks(rotation=0, ha='center')
+plt.tight_layout()
+plt.show()
+
+print('--------end of trial with seaborn on the distribution of devices---------')
 
 
 # Create a pivot table of the number of devices and the percentage
@@ -706,8 +775,16 @@ pivot_table_gender_percentage = pivot_table_gender.divide(total_devices, axis=0)
 display(pivot_table_gender_percentage)
 
 
+print('--------Gender with the number of devices (each column should add up to 100%)------------------')
+# Create a pivot table of the number of devices and the percentage (each column adds up to 100%)
+pivot_table_gender_column_percent = pivot_table_gender.div(pivot_table_gender.sum(axis=0), axis=1) * 100
+pivot_table_gender_column_percent_numeric = pivot_table_gender_column_percent.round(1)  # Numeric version for plotting
+pivot_table_gender_column_percent = pivot_table_gender_column_percent_numeric.astype(str) + '%'
+display(pivot_table_gender_column_percent_numeric)
 
-print('-----------------Gender with the number of devices (each row show add up to  100%)------------------')
+
+
+print('-----------------Gender with the number of devices (each row should add up to  100%)------------------')
 # Create a pivot table of the number of devices and the percentage (each row adds up to 100%)
 pivot_table_gender_row_percent = pivot_table_gender.div(pivot_table_gender.sum(axis=1), axis=0) * 100
 pivot_table_gender_row_percent_numeric = pivot_table_gender_row_percent.round(1)  # Numeric version for plotting
