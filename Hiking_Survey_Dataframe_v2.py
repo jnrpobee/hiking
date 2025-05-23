@@ -13,9 +13,6 @@ import seaborn as sns
 from skimpy import skim 
 
 display("---------------- Apps ---------/n")
-
-import pandas as pd
-
 # Load only Sheet 2
 df = pd.read_excel("hiking_data_v2.xlsx", sheet_name="AppUpdate")
 
@@ -3359,14 +3356,6 @@ plt.ylabel('Count')
 plt.title('Like to Hike Alone by Headphones')
 plt.show()
 print('done\n')
-
-print(' -----using seaborn to plot the boxplot-----')
-# Create a boxplot using seaborn
-sns.boxplot(x='like_to_hike_alone_value', y='Headphones', data=pivot_table_headphones_like_to_hike_alone_value.T)
-plt.xlabel('Like to Hike Alone (numeric)')
-plt.ylabel('count')
-plt.title('Like to Hike Alone by Headphones')
-plt.show()
 
 
 
