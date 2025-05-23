@@ -660,15 +660,8 @@ print('--------end of device counts using palette=tab10---------')
 
 print('--------trial with seaborn on the distribution of devices---------')
 # Create a bar plot using seaborn
-
-# Ensure 0 is included in the number of devices, even if not present in the data
-if 0 not in df['number _of_devices'].unique():
-    df_with_0 = pd.concat([df, pd.DataFrame({'number _of_devices': [0]})], ignore_index=True)
-else:
-    df_with_0 = df
-
 plt.figure(figsize=(8, 5))
-sns.countplot(data=df_with_0, x='number _of_devices', hue='number _of_devices', palette='tab10', legend=False)
+sns.countplot(data=df, x='number _of_devices', hue='number _of_devices', palette='tab10', legend=False)
 plt.xlabel('Number of Devices')
 plt.ylabel('Count')
 plt.title('Distribution of Devices')
@@ -792,8 +785,9 @@ pivot_table_gender_row_percent = pivot_table_gender_row_percent_numeric.astype(s
 display(pivot_table_gender_row_percent)
 
 # Create a bar graph of the pivot table of the number of devices and the percentage
-colors = plt.cm.tab20(range(len(pivot_table_gender_row_percent_numeric.columns)))
-ax = pivot_table_gender_row_percent_numeric.T.plot(kind='bar', width=0.8, color=colors)
+plt.figure(figsize=(11, 5))
+colors = plt.cm.tab10(range(len(pivot_table_gender_row_percent_numeric.columns)))
+ax = pivot_table_gender_row_percent_numeric.T.plot(kind='bar', width=0.95, color=colors)
 plt.xlabel('Number of Devices')
 plt.ylabel('Percentage')
 plt.title('Percentage of Devices by Gender')
@@ -937,7 +931,7 @@ mapping = {
     'Fill in the blank' : 'Gender', # Gender for fill in the blank
 }
 print ("\nreplacement of Gender to  General column...")
-df['General'] = df['Gender'].replace(mapping)
+df['General'] = df['Gender'].replace(mapping).infer_objects(copy=False)
 df['General'] = df['General'].astype(str)
 
 # Create a new dataframe that contains General column and all the columns that contain the word hike in the column name
@@ -998,7 +992,7 @@ mapping = {
     'Female': 'Gender',  # Gender for female
 }
 print ("\nreplacement of Gender to  General ciolumn...")
-df['General'] = df['Gender'].replace(mapping)
+df['General'] = df['Gender'].replace(mapping).infer_objects(copy=False)
 df['General'] = df['General'].astype(str)
 print ("Done\n")
 # Exclude the rows with 'Fill in the blank' in the Gender column
@@ -1243,7 +1237,7 @@ print("Non-finite values in 'like_to_hike_alone':")
 print(df['like_to_hike_alone'][~np.isfinite(pd.to_numeric(df['like_to_hike_alone'], errors='coerce'))])
 
 
-df['like_to_hike_alone_value'] = df['like_to_hike_alone'].replace(mapping)
+df['like_to_hike_alone_value'] = df['like_to_hike_alone'].replace(mapping).infer_objects(copy=False)
 # Convert to numeric, forcing errors to NaN
 df['like_to_hike_alone_value'] = pd.to_numeric(df['like_to_hike_alone_value'], errors='coerce')
 # Step 1: Print the non-finite values
@@ -3289,9 +3283,6 @@ print("Expected frequencies:", expected)
 
 
 
-
-
-
 #-------------------------------------------------#
 # Define a mapping from categories to numerical values of like to hike alone column
 mapping = {
@@ -3369,6 +3360,13 @@ plt.title('Like to Hike Alone by Headphones')
 plt.show()
 print('done\n')
 
+print(' -----using seaborn to plot the boxplot-----')
+# Create a boxplot using seaborn
+sns.boxplot(x='like_to_hike_alone_value', y='Headphones', data=pivot_table_headphones_like_to_hike_alone_value.T)
+plt.xlabel('Like to Hike Alone (numeric)')
+plt.ylabel('count')
+plt.title('Like to Hike Alone by Headphones')
+plt.show()
 
 
 
