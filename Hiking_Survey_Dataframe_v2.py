@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import norm
 from scipy.stats import ttest_ind
+from scipy.stats import chi2_contingency
+from scipy.stats import chi2
 from statsmodels.stats.proportion import proportions_ztest
 from statsmodels.stats.multitest import fdrcorrection
 from IPython.display import display
@@ -535,6 +537,7 @@ mapping = {
 print ("doing the replacement...")
 # Replace the categories with their numerical values
 df['hiking_duration_numeric'] = df['hiking_duration'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
 #display (df['hiking_duration_numeric'].head(5))
 print ("Done")
 
@@ -929,6 +932,7 @@ mapping = {
 }
 print ("\nreplacement of Gender to  General column...")
 df['General'] = df['Gender'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
 df['General'] = df['General'].astype(str)
 
 # Create a new dataframe that contains General column and all the columns that contain the word hike in the column name
@@ -990,6 +994,7 @@ mapping = {
 }
 print ("\nreplacement of Gender to  General ciolumn...")
 df['General'] = df['Gender'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
 df['General'] = df['General'].astype(str)
 print ("Done\n")
 # Exclude the rows with 'Fill in the blank' in the Gender column
@@ -1235,6 +1240,7 @@ print(df['like_to_hike_alone'][~np.isfinite(pd.to_numeric(df['like_to_hike_alone
 
 
 df['like_to_hike_alone_value'] = df['like_to_hike_alone'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
 # Convert to numeric, forcing errors to NaN
 df['like_to_hike_alone_value'] = pd.to_numeric(df['like_to_hike_alone_value'], errors='coerce')
 # Step 1: Print the non-finite values
@@ -1297,6 +1303,7 @@ print('done\n')
 
 
 
+print('--------------------Like to hike in group-------------------\n')
 # Define a mapping from categories to numerical values of like to hike in group column 
 mapping = {
     'Strongly disagree': 1,  # 1 for strongly disagree
@@ -1307,6 +1314,7 @@ mapping = {
 }
 print ("\nreplacement of like to hike in group to numeric value...")
 df['like_to_hike_in_group_num'] = df['like_to_hike_in_group'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
 df['like_to_hike_in_group_num'] = df['like_to_hike_in_group_num'].astype(int)
 print ("Done\n")
 #exclude the rows with fill in the blank
@@ -1368,6 +1376,7 @@ mapping = {
 }
 print ("\nreplacement of like to hike near home to numeric value...")
 df['like_to_hike_near_home_num'] = df['like_to_hike_near_home'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
 df['like_to_hike_near_home_num'] = df['like_to_hike_near_home_num'].astype(int)
 #print (df['like_to_hike_near_home_num'].head(5))
 print ("Done\n")
@@ -1432,6 +1441,7 @@ mapping = {
 }
 print ("\nreplacement of hike while traveling to numeric value...")
 df['hike_while_traveling_num'] = df['hike_while_traveling'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
 df['hike_while_traveling_num'] = df['hike_while_traveling_num'].astype(int)
 print ("Done\n")
 #exclude the rows with fill in the blank
@@ -1494,6 +1504,7 @@ mapping = {
 }
 print ("\nreplacement of hike for health to numeric value...")
 df['hike_for_health_num'] = df['hike_for_health'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_health_num'])
 
@@ -1585,6 +1596,7 @@ mapping = {
 }
 print ("\nreplacement of hike for social interaction to numeric value...")
 df['hike_for_social_interaction_num'] = df['hike_for_social_interaction'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_social_interaction_num'])
 
@@ -1651,7 +1663,11 @@ mapping = {
     'Strongly agree': 5, # 5 for strongly agree
 }
 print ("\nreplacement of hike for fun to numeric value...")
+# Explicitly call infer_objects to avoid FutureWarning about downcasting
 df['hike_for_fun_num'] = df['hike_for_fun'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
+# Optionally, opt-in to the future behavior to suppress the warning globally
+pd.set_option('future.no_silent_downcasting', True)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_fun_num'])
 
@@ -1716,6 +1732,7 @@ mapping = {
 }
 print ("\nreplacement of hike for meditation to numeric value...")
 df['hike_for_meditation_num'] = df['hike_for_mediation'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_meditation_num'])
 
@@ -1780,6 +1797,7 @@ mapping = {
 }
 print ("\nreplacement of hike for less than 1 hour to numeric value...")
 df['hike_for_less_than_1hour_num'] = df['hike_for_less_than_1hour'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_less_than_1hour_num'])
 
@@ -1842,6 +1860,7 @@ mapping = {
 }
 print ("\nreplacement of hike for half a day to numeric value...")
 df['hike_for_half_a_day_num'] = df['hike_for_half_a_day'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_half_a_day_num'])
 
@@ -1902,6 +1921,7 @@ mapping = {
 }
 print ("\nreplacement of hike for less than a day to numeric value...")
 df['hike_for_less_than_a_day_num'] = df['hike_for_less_than_a_day'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_less_than_a_day_num'])
 
@@ -1965,6 +1985,7 @@ mapping = {
 }
 print ("\nreplacement of hike for multiple days to numeric value...")
 df['hike_for_multiple_days_num'] = df['hike_for_multiple_days'].replace(mapping).infer_objects(copy=False)
+pd.set_option('future.no_silent_downcasting', True)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['hike_for_multiple_days_num'])
 
@@ -2016,7 +2037,7 @@ plt.title('Hike for Multiple Days')
 plt.show()
 print('done\n')
 
-
+print('-----ttest of easy hike and difficult hike-----\n')
 # Define a mapping from categories to numerical values of easy hike column
 mapping = {
     'Strongly disagree': 1,  # 1 for strongly disagree
@@ -2027,6 +2048,7 @@ mapping = {
 }
 print ("\nreplacement of easy hike to numeric value...")
 df['easy_hike_num'] = df['easy_hike'].replace(mapping).infer_objects(copy=False)  # suppress FutureWarning
+pd.set_option('future.no_silent_downcasting', True)
 # Step 1: Identify non-finite values (e.g., NaN, inf, -inf)
 non_finite_mask = ~np.isfinite(df['easy_hike_num'])
 
@@ -2044,6 +2066,7 @@ df_valid_gender_pivot = df_valid_gender.pivot_table(index='Gender', columns='dif
 print(df_valid_gender_pivot)
 #ttest ends
 
+print('----difficult hike value againt gender----\n')
 # Create 'difficult_hike_n' column if it does not exist
 mapping = {
     'Strongly disagree': 1,
@@ -2054,27 +2077,16 @@ mapping = {
 }
 if 'difficult_hike_n' not in df.columns:
     df['difficult_hike_n'] = df['difficult_hike'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
     df['difficult_hike_n'] = df['difficult_hike_n'].fillna(0).astype(int)
     df_valid_gender = df[df['Gender'] != 'Fill in the blank']
 
-print('\ndifficult_hike_n table\n')
+
+print('\n----difficult_hike_n table----\n')
 pivot_table_difficult_hike_n = df_valid_gender.pivot_table(index='Gender', columns='difficult_hike_n', aggfunc='size', fill_value=0)
 print(pivot_table_difficult_hike_n)
 print('Done\n')
 
-#Mann–Whitney U test
-#from scipy.stats import mannwhitneyu
-# Filter the male and female participants with a value in the difficult_hike_n column
-#df_gender_difficult_hike_n = df[df['Gender'].isin(['Male', 'Female']) & df['difficult_hike_n'].notnull()][['Gender', 'difficult_hike_n']]
-
-# Perform the Mann-Whitney U test
-# u_stat, p_value = mannwhitneyu(df_gender_difficult_hike_n[df_gender_difficult_hike_n['Gender'] == 'Male']['difficult_hike_n'],
-#                               df_gender_difficult_hike_n[df_gender_difficult_hike_n['Gender'] == 'Female']['difficult_hike_n'])
-
-# display(f'Mann-Whitney U test statistic: {u_stat:.2f}')
-# display(f'p-value: {p_value:.4f}')
-# # Filter the male and female participants with a value in the difficult_hike_n column
-# df_gender_difficult_hike_n = df[df['Gender'].isin(['Male', 'Female']) & df['difficult_hike_n'].notnull()][['Gender', 'difficult_hike_n']]
 
 # Set significance level
 alpha = 0.05
@@ -2118,7 +2130,7 @@ plt.show()
 print('done\n')
 
 
-
+print('--------summary statistics of the variables of interest--------\n')
 # A table of summary statistics for the variables of interest
 variables = ['like_to_hike_alone_value', 'like_to_hike_in_group_num', 'like_to_hike_near_home_num', 'hike_while_traveling_num', 'hike_for_health_num', 'hike_for_social_interaction_num', 'hike_for_fun_num', 'hike_for_meditation_num', 'hike_for_less_than_1hour_num', 'hike_for_half_a_day_num', 'hike_for_less_than_a_day_num', 'hike_for_multiple_days_num', 'easy_hike_num', 'difficult_hike_n']
 
@@ -3188,6 +3200,8 @@ plt.show()
 display('-------- correlation b/n headphones and hike alone ----------\n')
 
 import pandas as pd
+from scipy.stats import ttest_ind
+from scipy.stats import chi2_contingency
 df = pd.read_excel('hiking_data_v2.xlsx')
 
 # Create a new column 'Headphones' based on the values in the 'combined' column that contain 'headphones/earbuds'
@@ -3290,7 +3304,8 @@ mapping = {
     'Strongly agree': 5, # 5 for strongly agree
 }
 print ("\nreplacement of like to hike alone to numeric value...")
-df['like_to_hike_alone_value'] = df['like_to_hike_alone'].replace(mapping).infer_objects(copy=False)  # suppress FutureWarning
+df['like_to_hike_alone_value'] = df['like_to_hike_alone'].replace(mapping).infer_objects(copy=False) 
+pd.set_option('future.no_silent_downcasting', True)# suppress FutureWarning
 # Step 1: Print the non-finite values
 print("Non-finite values in 'like_to_hike_alone_value':")
 print(df['like_to_hike_alone_value'][~np.isfinite(df['like_to_hike_alone_value'])])
@@ -3384,3 +3399,747 @@ pivot_table_male_female_top_4_common_devices = df_male_female_3_devices.pivot_ta
 top_4_common_devices = pivot_table_male_female_top_4_common_devices.sum(axis=0).sort_values(ascending=False).head(4).index
 # ...existing code...
 
+
+
+print('-------app used by 3 device carriers-------\n')
+# Create a new column 'App' based on the values in the 'combined' column that contain 'app'
+df['App'] = df['combined'].str.contains('app', case=False)
+df['App'] = df['App'].astype(object)  # <-- Fix: cast to object before assigning strings
+# Replace True with 'App' in the 'App' column   
+df.loc[df['App'] == True, 'App'] = 'App'
+# Replace False with 'No App' in the 'App' column
+df.loc[df['App'] == False, 'App'] = 'No App'
+# Create a new dataframe 'app' that contains rows with 'app' in the 'combined' column
+app = df[df['combined'].str.contains('app', case=False)]
+# display(app)
+
+# Create a list of apps used by 3 device carriers
+apps_3_devices = df[(df['number _of_devices'] == 3) & (df['App'] == 'App')]['combined'].str.extractall(r'(\b\w+\b app)').dropna()[0].unique().tolist()
+print("Apps used by 3 device carriers:", apps_3_devices)
+
+
+
+
+
+print('\n\n\n ---- devices and preferences ----\n\n\n')
+
+
+print('\n ---- headphones and hike for meditation correlation ----\n')
+# Create a pivot table of Headphones and hike_for_meditation
+pivot_table_headphones_hike_for_meditation = df.pivot_table(index='Headphones', columns='hike_for_mediation', aggfunc='size', fill_value=0)
+# Reorder the columns of the pivot table
+#create "hike_for_meditation_num" column if it doesn't exist
+if 'hike_for_mediation_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['hike_for_mediation_num'] = df['hike_for_mediation'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['hike_for_mediation_num'] = df['hike_for_mediation_num'].fillna(0).astype(int)
+    
+    # Create a pivot table of Headphones and hike_for_meditation
+pivot_table_headphones_hike_for_meditation = df.pivot_table(index='Headphones', columns='hike_for_mediation_num', aggfunc='size', fill_value=0)
+print('Pivot table of Headphones and hike_for_meditation:')
+print(pivot_table_headphones_hike_for_meditation)
+#set significance level
+alpha = 0.05
+# perform the t-test
+t_stat, p_value = ttest_ind(pivot_table_headphones_hike_for_meditation.loc['Headphones'],
+                            pivot_table_headphones_hike_for_meditation.loc['No Headphones'],
+                            equal_var=False)
+# Print the t-statistic and p-value
+print(f"t-statistic: {t_stat:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+
+#Summary statistics for each group 
+summary_stats = pivot_table_headphones_hike_for_meditation.T.describe()
+# display(summary_stats)
+
+print('\n\n ---- headphones and like to hike in group correlation ----\n')
+#create a "like_to_hike_in_group_num" column if it doesn't exist
+if 'like_to_hike_in_group_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['like_to_hike_in_group_num'] = df['like_to_hike_in_group'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['like_to_hike_in_group_num'] = df['like_to_hike_in_group_num'].fillna(0).astype(int)
+# Create a pivot table of Headphones and like_to_hike_in_group
+pivot_table_headphones_like_to_hike_in_group = df.pivot_table(index='Headphones', columns='like_to_hike_in_group_num', aggfunc='size', fill_value=0)
+print('Pivot table of Headphones and like_to_hike_in_group:')
+print(pivot_table_headphones_like_to_hike_in_group)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stat, p_value = ttest_ind(pivot_table_headphones_like_to_hike_in_group.loc['Headphones'],
+                            pivot_table_headphones_like_to_hike_in_group.loc['No Headphones'],
+                            equal_var=False)
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stat:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+# Summary statistics for each group
+summary_stats = pivot_table_headphones_like_to_hike_in_group.T.describe()
+# display(summary_stats)
+
+
+print('\n\n ---- headphones and like to hike alone correlation ----\n')
+#create a "like_to_hike_alone_num" column if it doesn't exist
+if 'like_to_hike_alone_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['like_to_hike_alone_num'] = df['like_to_hike_alone'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['like_to_hike_alone_num'] = df['like_to_hike_alone_num'].fillna(0).astype(int)
+# Create a pivot table of Headphones and like_to_hike_alone
+pivot_table_headphones_like_to_hike_alone = df.pivot_table(index='Headphones', columns='like_to_hike_alone_num', aggfunc='size', fill_value=0)
+print('Pivot table of Headphones and like_to_hike_alone:')
+print(pivot_table_headphones_like_to_hike_alone)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stat, p_value = ttest_ind(pivot_table_headphones_like_to_hike_alone.loc['Headphones'],
+                            pivot_table_headphones_like_to_hike_alone.loc['No Headphones'],
+                            equal_var=False)
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stat:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+# Summary statistics for each group
+summary_stats = pivot_table_headphones_like_to_hike_alone.T.describe()
+# display(summary_stats)
+
+
+print('\n\n ---- headphones and social interaction correlation ----\n')
+#create a "hike_for_social_interaction_num" column if it doesn't exist
+if 'hike_for_social_interaction_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['hike_for_social_interaction_num'] = df['hike_for_social_interaction'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['hike_for_social_interaction_num'] = df['hike_for_social_interaction_num'].fillna(0).astype(int)
+# Create a pivot table of Headphones and hike_for_social_interaction
+pivot_table_headphones_hike_for_social_interaction = df.pivot_table(index='Headphones', columns='hike_for_social_interaction_num', aggfunc='size', fill_value=0)
+print('Pivot table of Headphones and hike_for_social_interaction:')
+print(pivot_table_headphones_hike_for_social_interaction)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stat, p_value = ttest_ind(pivot_table_headphones_hike_for_social_interaction.loc['Headphones'],
+                            pivot_table_headphones_hike_for_social_interaction.loc['No Headphones'],
+                            equal_var=False)
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stat:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+# Summary statistics for each group
+summary_stats = pivot_table_headphones_hike_for_social_interaction.T.describe()
+# display(summary_stats)
+
+
+print('\n\n ---- Portable charger/battery and hike for less than a day correlation ----\n')
+# Create a pivot table of Portable charger/battery and hike_for_less_than_a_day
+if 'hike_for_less_than_a_day_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['hike_for_less_than_a_day_num'] = df['hike_for_less_than_a_day'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['hike_for_less_than_a_day_num'] = df['hike_for_less_than_a_day_num'].fillna(0).astype(int)
+# Create a new column 'Portable charger/battery' indicating presence in 'combined'
+df['Portable charger/battery'] = df['combined'].str.contains('Portable charger/battery', case=False)
+df['Portable charger/battery'] = df['Portable charger/battery'].map({True: 'Portable charger/battery', False: 'No Portable charger/battery'})
+
+# Create a pivot table of Portable charger/battery and hike_for_less_than_a_day
+pivot_table_portable_charger_hike_for_less_than_a_day = df.pivot_table(index='Portable charger/battery', columns='hike_for_less_than_a_day_num', aggfunc='size', fill_value=0)
+print('Pivot table of Portable charger/battery and hike_for_less_than_a_day:')
+print(pivot_table_portable_charger_hike_for_less_than_a_day)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stat, p_value = ttest_ind(pivot_table_portable_charger_hike_for_less_than_a_day.loc['Portable charger/battery'],
+                            pivot_table_portable_charger_hike_for_less_than_a_day.loc['No Portable charger/battery'],
+                            equal_var=False)
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stat:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+# Summary statistics for each group
+summary_stats = pivot_table_portable_charger_hike_for_less_than_a_day.T.describe()
+# display(summary_stats)
+
+
+print('\n\n ---- Portable charger/battery and hike for multiple days correlation ----\n')
+# Create a pivot table of Portable charger/battery and hike_for_multiple_days
+if 'hike_for_multiple_days_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['hike_for_multiple_days_num'] = df['hike_for_multiple_days'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['hike_for_multiple_days_num'] = df['hike_for_multiple_days_num'].fillna(0).astype(int)
+# Create a pivot table of Portable charger/battery and hike_for_multiple_days
+pivot_table_portable_charger_hike_for_multiple_days = df.pivot_table(index='Portable charger/battery', columns='hike_for_multiple_days_num', aggfunc='size', fill_value=0)
+print('Pivot table of Portable charger/battery and hike_for_multiple_days:')
+print(pivot_table_portable_charger_hike_for_multiple_days)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stat, p_value = ttest_ind(pivot_table_portable_charger_hike_for_multiple_days.loc['Portable charger/battery'],
+                            pivot_table_portable_charger_hike_for_multiple_days.loc['No Portable charger/battery'],
+                            equal_var=False)
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stat:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+# Summary statistics for each group
+summary_stats = pivot_table_portable_charger_hike_for_multiple_days.T.describe()
+# display(summary_stats)
+
+#display a table containing all the t_statistic, p-value, and significance for each of the above correlations
+print('\n\n ---- devices and preferences section ----\n\n\n')
+# Create a summary table for all the t-statistics, p-values, and significance
+
+# Calculate and store t-statistics and p-values for each correlation
+t_stat_headphones_meditation, p_value_headphones_meditation = ttest_ind(
+    pivot_table_headphones_hike_for_meditation.loc['Headphones'],
+    pivot_table_headphones_hike_for_meditation.loc['No Headphones'],
+    equal_var=False
+)
+t_stat_headphones_group, p_value_headphones_group = ttest_ind(
+    pivot_table_headphones_like_to_hike_in_group.loc['Headphones'],
+    pivot_table_headphones_like_to_hike_in_group.loc['No Headphones'],
+    equal_var=False
+)
+t_stat_headphones_alone, p_value_headphones_alone = ttest_ind(
+    pivot_table_headphones_like_to_hike_alone.loc['Headphones'],
+    pivot_table_headphones_like_to_hike_alone.loc['No Headphones'],
+    equal_var=False
+)
+t_stat_headphones_social, p_value_headphones_social = ttest_ind(
+    pivot_table_headphones_hike_for_social_interaction.loc['Headphones'],
+    pivot_table_headphones_hike_for_social_interaction.loc['No Headphones'],
+    equal_var=False
+)
+t_stat_portable_less_day, p_value_portable_less_day = ttest_ind(
+    pivot_table_portable_charger_hike_for_less_than_a_day.loc['Portable charger/battery'],
+    pivot_table_portable_charger_hike_for_less_than_a_day.loc['No Portable charger/battery'],
+    equal_var=False
+)
+t_stat_portable_multiple_days, p_value_portable_multiple_days = ttest_ind(
+    pivot_table_portable_charger_hike_for_multiple_days.loc['Portable charger/battery'],
+    pivot_table_portable_charger_hike_for_multiple_days.loc['No Portable charger/battery'],
+    equal_var=False
+)
+
+summary_table = pd.DataFrame({
+    'Correlation': [
+        'Headphones and hike for meditation',
+        'Headphones and like to hike in group',
+        'Headphones and like to hike alone',
+        'Headphones and social interaction',
+        'Portable charger/battery and hike for less than a day',
+        'Portable charger/battery and hike for multiple days'
+    ],
+    't-statistic': [
+        f"{t_stat_headphones_meditation:.2f}",
+        f"{t_stat_headphones_group:.2f}",
+        f"{t_stat_headphones_alone:.2f}",
+        f"{t_stat_headphones_social:.2f}",
+        f"{t_stat_portable_less_day:.2f}",
+        f"{t_stat_portable_multiple_days:.2f}"
+    ],
+    'p-value': [
+        f"{p_value_headphones_meditation:.4f}",
+        f"{p_value_headphones_group:.4f}",
+        f"{p_value_headphones_alone:.4f}",
+        f"{p_value_headphones_social:.4f}",
+        f"{p_value_portable_less_day:.4f}",
+        f"{p_value_portable_multiple_days:.4f}"
+    ],
+    'Significant': [
+        p_value_headphones_meditation < alpha,
+        p_value_headphones_group < alpha,
+        p_value_headphones_alone < alpha,
+        p_value_headphones_social < alpha,
+        p_value_portable_less_day < alpha,
+        p_value_portable_multiple_days < alpha
+    ]
+})
+display(summary_table)
+
+print('\n\n ---- end of devices and preferences section ----\n\n\n')
+
+print('\n\n\n ---- apps and preferences ----\n\n\n')
+
+print('\n\n ---- maps and like to hike near home correlation ----\n')
+# Create a pivot table of Maps and like_to_hike_near_home
+if 'like_to_hike_near_home_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['like_to_hike_near_home_num'] = df['like_to_hike_near_home'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['like_to_hike_near_home_num'] = df['like_to_hike_near_home_num'].fillna(0).astype(int)
+# Create a new column 'Maps' indicating presence in 'combined'
+df['Maps'] = df['Apps'].str.contains('maps', case=False)
+df['Maps'] = df['Maps'].map({True: 'Maps', False: 'No Maps'})
+# Create a pivot table of Maps and like_to_hike_near_home
+pivot_table_maps_like_to_hike_near_home = df.pivot_table(index='Maps', columns='like_to_hike_near_home_num', aggfunc='size', fill_value=0)
+print('Pivot table of Maps and like_to_hike_near_home:')
+print(pivot_table_maps_like_to_hike_near_home)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stat, p_value = ttest_ind(pivot_table_maps_like_to_hike_near_home.loc['Maps'],
+                            pivot_table_maps_like_to_hike_near_home.loc['No Maps'],
+                            equal_var=False)
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stat:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+# Summary statistics for each group
+summary_stats = pivot_table_maps_like_to_hike_near_home.T.describe()
+# display(summary_stats)
+
+
+print('\n\n ---- maps and like to hike while traveling correlation ----\n')
+# Create a pivot table of Maps and like_to_hike_while_traveling
+if 'like_to_hike_while_traveling_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['like_to_hike_while_traveling_num'] = df['hike_while_traveling'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['like_to_hike_while_traveling_num'] = df['like_to_hike_while_traveling_num'].fillna(0).astype(int)
+# Create a pivot table of Maps and like_to_hike_while_traveling
+pivot_table_maps_like_to_hike_while_traveling = df.pivot_table(index='Maps', columns='like_to_hike_while_traveling_num', aggfunc='size', fill_value=0)
+print('Pivot table of Maps and like_to_hike_while_traveling:')
+print(pivot_table_maps_like_to_hike_while_traveling)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stat, p_value = ttest_ind(pivot_table_maps_like_to_hike_while_traveling.loc['Maps'],
+                            pivot_table_maps_like_to_hike_while_traveling.loc['No Maps'],
+                            equal_var=False)
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stat:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+# Summary statistics for each group
+summary_stats = pivot_table_maps_like_to_hike_while_traveling.T.describe()
+# display(summary_stats)
+
+
+print('\n\n ---- camera and like to hike near home correlation ----\n')
+# Create a pivot table of Camera and like_to_hike_near_home
+if 'like_to_hike_near_home_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['like_to_hike_near_home_num'] = df['like_to_hike_near_home'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['like_to_hike_near_home_num'] = df['like_to_hike_near_home_num'].fillna(0).astype(int)
+# Create a new column 'Camera' indicating presence in 'combined'
+df['Camera'] = df['Apps'].str.contains('camera', case=False)
+df['Camera'] = df['Camera'].map({True: 'Camera', False: 'No Camera'})
+# Create a pivot table of Camera and like_to_hike_near_home
+pivot_table_camera_like_to_hike_near_home = df.pivot_table(index='Camera', columns='like_to_hike_near_home_num', aggfunc='size', fill_value=0)
+print('Pivot table of Camera and like_to_hike_near_home:')
+print(pivot_table_camera_like_to_hike_near_home)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stat, p_value = ttest_ind(pivot_table_camera_like_to_hike_near_home.loc['Camera'],
+                            pivot_table_camera_like_to_hike_near_home.loc['No Camera'],
+                            equal_var=False)
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stat:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+# Summary statistics for each group
+summary_stats = pivot_table_camera_like_to_hike_near_home.T.describe()
+# display(summary_stats)
+
+print('\n\n ---- camera and like to hike while traveling correlation ----\n')
+# Create a pivot table of Camera and like_to_hike_while_traveling
+if 'like_to_hike_while_traveling_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['like_to_hike_while_traveling_num'] = df['hike_while_traveling'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['like_to_hike_while_traveling_num'] = df['like_to_hike_while_traveling_num'].fillna(0).astype(int)
+# Create a pivot table of Camera and like_to_hike_while_traveling
+pivot_table_camera_like_to_hike_while_traveling = df.pivot_table(index='Camera', columns='like_to_hike_while_traveling_num', aggfunc='size', fill_value=0)
+print('Pivot table of Camera and like_to_hike_while_traveling:')
+print(pivot_table_camera_like_to_hike_while_traveling)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stat, p_value = ttest_ind(pivot_table_camera_like_to_hike_while_traveling.loc['Camera'],
+                            pivot_table_camera_like_to_hike_while_traveling.loc['No Camera'],
+                            equal_var=False)
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stat:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+# Summary statistics for each group 
+summary_stats = pivot_table_camera_like_to_hike_while_traveling.T.describe()
+# display(summary_stats)
+
+
+print('\n\n ---- maps and multiple days correlation ----\n')
+# Create a pivot table of Maps and hike_for_multiple_days
+if 'hike_for_multiple_days_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['hike_for_multiple_days_num'] = df['hike_for_multiple_days'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['hike_for_multiple_days_num'] = df['hike_for_multiple_days_num'].fillna(0).astype(int)
+# Create a pivot table of Maps and hike_for_multiple_days
+pivot_table_maps_hike_for_multiple_days = df.pivot_table(index='Maps', columns='hike_for_multiple_days_num', aggfunc='size', fill_value=0)
+print('Pivot table of Maps and hike_for_multiple_days:')
+print(pivot_table_maps_hike_for_multiple_days)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stat, p_value = ttest_ind(pivot_table_maps_hike_for_multiple_days.loc['Maps'],
+                            pivot_table_maps_hike_for_multiple_days.loc['No Maps'],
+                            equal_var=False)
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stat:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+# Summary statistics for each group
+summary_stats = pivot_table_maps_hike_for_multiple_days.T.describe()
+# display(summary_stats)
+
+
+print('\n\n ---- Text messaging and hike for less than an hour correlation ----\n')
+# Create a pivot table of Text messaging and hike_for_less_than_an_hour
+if 'hike_for_less_than_an_hour_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['hike_for_less_than_an_hour_num'] = df['hike_for_less_than_1hour'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['hike_for_less_than_an_hour_num'] = df['hike_for_less_than_an_hour_num'].fillna(0).astype(int)   
+# Create a new column 'Text messaging' indicating presence in 'combined'
+df['Text messaging'] = df['Apps'].str.contains('text messaging', case=False)
+df['Text messaging'] = df['Text messaging'].map({True: 'Text messaging', False: 'No Text messaging'})
+# Create a pivot table of Text messaging and hike_for_less_than_an_hour
+pivot_table_text_messaging_hike_for_less_than_an_hour = df.pivot_table(index='Text messaging', columns='hike_for_less_than_an_hour_num', aggfunc='size', fill_value=0)
+print('Pivot table of Text messaging and hike_for_less_than_an_hour:')
+print(pivot_table_text_messaging_hike_for_less_than_an_hour)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stat, p_value = ttest_ind(pivot_table_text_messaging_hike_for_less_than_an_hour.loc['Text messaging'],
+                            pivot_table_text_messaging_hike_for_less_than_an_hour.loc['No Text messaging'],
+                            equal_var=False)
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stat:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+# Summary statistics for each group
+summary_stats = pivot_table_text_messaging_hike_for_less_than_an_hour.T.describe()
+# display(summary_stats)
+
+
+#display a table containing all the t_statistic, p-value, and significance for each of the above correlations
+print('\n\n ---- apps and preferences section ----\n\n\n')
+# Create a summary table for all the t-statistics, p-values, and significance
+# Calculate and store t-statistics and p-values for each correlation
+t_stat_maps_near_home, p_value_maps_near_home = ttest_ind(
+    pivot_table_maps_like_to_hike_near_home.loc['Maps'],
+    pivot_table_maps_like_to_hike_near_home.loc['No Maps'],
+    equal_var=False
+)
+t_stat_maps_traveling, p_value_maps_traveling = ttest_ind(
+    pivot_table_maps_like_to_hike_while_traveling.loc['Maps'],
+    pivot_table_maps_like_to_hike_while_traveling.loc['No Maps'],
+    equal_var=False
+)
+t_stat_camera_near_home, p_value_camera_near_home = ttest_ind(
+    pivot_table_camera_like_to_hike_near_home.loc['Camera'],
+    pivot_table_camera_like_to_hike_near_home.loc['No Camera'],
+    equal_var=False
+)
+t_stat_camera_traveling, p_value_camera_traveling = ttest_ind(
+    pivot_table_camera_like_to_hike_while_traveling.loc['Camera'],
+    pivot_table_camera_like_to_hike_while_traveling.loc['No Camera'],
+    equal_var=False
+)
+t_stat_maps_multiple_days, p_value_maps_multiple_days = ttest_ind(
+    pivot_table_maps_hike_for_multiple_days.loc['Maps'],
+    pivot_table_maps_hike_for_multiple_days.loc['No Maps'],
+    equal_var=False
+)
+t_stat_text_messaging_less_hour, p_value_text_messaging_less_hour = ttest_ind(
+    pivot_table_text_messaging_hike_for_less_than_an_hour.loc['Text messaging'],
+    pivot_table_text_messaging_hike_for_less_than_an_hour.loc['No Text messaging'],
+    equal_var=False
+)
+summary_table_apps = pd.DataFrame({
+    'Correlation': [
+        'Maps and like to hike near home',
+        'Maps and like to hike while traveling',
+        'Camera and like to hike near home',
+        'Camera and like to hike while traveling',
+        'Maps and hike for multiple days',
+        'Text messaging and hike for less than an hour'
+    ],
+    't-statistic': [
+        f"{t_stat_maps_near_home:.2f}",
+        f"{t_stat_maps_traveling:.2f}",
+        f"{t_stat_camera_near_home:.2f}",
+        f"{t_stat_camera_traveling:.2f}",
+        f"{t_stat_maps_multiple_days:.2f}",
+        f"{t_stat_text_messaging_less_hour:.2f}"
+    ],
+    'p-value': [
+        f"{p_value_maps_near_home:.4f}",
+        f"{p_value_maps_traveling:.4f}",
+        f"{p_value_camera_near_home:.4f}",
+        f"{p_value_camera_traveling:.4f}",
+        f"{p_value_maps_multiple_days:.4f}",
+        f"{p_value_text_messaging_less_hour:.4f}"
+    ],
+    'Significant': [
+        p_value_maps_near_home < alpha,
+        p_value_maps_traveling < alpha,
+        p_value_camera_near_home < alpha,
+        p_value_camera_traveling < alpha,
+        p_value_maps_multiple_days < alpha,
+        p_value_text_messaging_less_hour < alpha
+    ]
+})
+display(summary_table_apps)
+print('\n\n ---- end of apps and preferences section ----\n\n\n')
+
+print('\n\n\n ---- devices and apps correlation ----\n\n\n')
+
+print('\n\n ---- headphones and audio app correlation ----\n')
+# Create a pivot table of Headphones and Audio
+if 'Audio' not in df.columns:
+    df['Audio'] = df['Apps'].str.contains('audio', case=False)
+    df['Audio'] = df['Audio'].map({True: 'Audio', False: 'No Audio'})
+
+# Create a pivot table of Headphones and Audio
+# Fill missing values before creating the pivot table
+df['Headphones'] = df['Headphones'].fillna('No Headphones')
+df['Audio'] = df['Audio'].fillna('No Audio')
+
+pivot_table_headphones_audio = df.pivot_table(index='Headphones', columns='Audio', aggfunc='size', fill_value=0)
+print('Pivot table of Headphones and Audio:')
+print(pivot_table_headphones_audio)
+
+# Show the sum of all values in the pivot table
+print("Total in pivot table:", pivot_table_headphones_audio.values.sum())
+print("Expected total (number of rows in df):", len(df))
+
+# Chi-square test of independence: Headphones/earbuds vs Audio app
+alpha = 0.05
+chi2, p_value, _, _ = chi2_contingency(pivot_table_headphones_audio)
+print(f"Chi-squared statistic: {chi2:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+
+# Display a heatmap of the contingency table
+plt.figure(figsize=(5, 4))
+sns.heatmap(pivot_table_headphones_audio, annot=True, fmt='d', cmap='Blues')
+plt.title('Headphones vs Audio App Usage')
+plt.xlabel('Audio App')
+plt.ylabel('Headphones/Earbuds')
+plt.tight_layout()
+plt.show()
+
+print("Total rows in df:", len(df))
+
+#list of headphones and audio usage
+headphones_audio_usage = df[df['Headphones'] == 'Headphones']['Audio'].value_counts().to_dict()
+# print("Headphones and Audio usage counts:", headphones_audio_usage)
+
+#display a table of headphones and audio and no audio usage
+headphones_audio_table = pd.DataFrame({
+    'Headphones/Earbuds': headphones_audio_usage.keys(),
+    'Audio Usage': headphones_audio_usage.values()
+})
+total_headphones_usage = headphones_audio_table['Audio Usage'].sum()
+headphones_audio_table['Percentage'] = (headphones_audio_table['Audio Usage'] / total_headphones_usage * 100).round(2)
+headphones_audio_table = headphones_audio_table.set_index('Headphones/Earbuds')
+display(headphones_audio_table)
+
+print('\n\n ---- end of headphones and audio app correlation ----\n\n\n')
+
+
+
+print('\n\n\n ---- number of devices and preferences correlation ----\n')
+print('\n\n ---- Number of Devices and easy hike preference correlation ----\n')
+
+# Create a pivot table of Number of Devices (few=3 or less, many=4 or more) vs. easy hike preference
+
+# Create a new column to categorize number of devices as 'Few' (<=3) or 'Many' (>=4)
+df['Device_Group'] = np.where(df['number _of_devices'] <= 3, 'Few (≤3)', 'Many (≥4)')
+
+
+
+print("\n\n ---- Device_Group and easy_hike_num correlation ----\n")
+# Create a new column for easy_hike_num
+if 'easy_hike_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['easy_hike_num'] = df['easy_hike'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['easy_hike_num'] = df['easy_hike_num'].fillna(0).astype(int)
+# Create a pivot table of Device_Group and easy_hike_num
+pivot_table_devicegroup_easyhike_num = df.pivot_table(index='Device_Group', columns='easy_hike_num', aggfunc='size', fill_value=0)
+print('Pivot table of Device_Group and easy_hike_num:')
+print(pivot_table_devicegroup_easyhike_num)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stats, p_values = ttest_ind(
+    pivot_table_devicegroup_easyhike_num.loc['Few (≤3)'],
+    pivot_table_devicegroup_easyhike_num.loc['Many (≥4)'],
+    equal_var=False
+)
+# Determine significance based on p-value
+significance = p_values < alpha
+
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stats:.2f}")
+print(f"p-value: {p_values:.4f}")
+print("Significant difference:", significance)
+# Summary statistics for each group
+summary_stats = pivot_table_devicegroup_easyhike_num.T.describe()
+display(summary_stats)
+
+
+print('\n\n ---- Device_Group and difficult hike preference correlation ----\n')
+# Create a new column for difficult_hike_num
+if 'difficult_hike_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['difficult_hike_num'] = df['difficult_hike'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['difficult_hike_num'] = df['difficult_hike_num'].fillna(0).astype(int)
+# Create a pivot table of Device_Group and difficult_hike_num
+pivot_table_devicegroup_difficult_hike_num = df.pivot_table(index='Device_Group', columns='difficult_hike_num', aggfunc='size', fill_value=0)
+print('Pivot table of Device_Group and difficult_hike_num:')
+print(pivot_table_devicegroup_difficult_hike_num)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stats, p_values = ttest_ind(
+    pivot_table_devicegroup_difficult_hike_num.loc['Few (≤3)'],
+    pivot_table_devicegroup_difficult_hike_num.loc['Many (≥4)'],
+    equal_var=False
+)
+# Determine significance based on p-value
+significance = p_values < alpha
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stats:.2f}")
+print(f"p-value: {p_values:.4f}")
+print("Significant difference:", significance)
+# Summary statistics for each group
+summary_stats = pivot_table_devicegroup_difficult_hike_num.T.describe()
+display(summary_stats)
+
+print('\n\n ---- Device_Group and hike for fun correlation ----\n')
+# Create a new column for hike_for_fun_num
+if 'hike_for_fun_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['hike_for_fun_num'] = df['hike_for_fun'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['hike_for_fun_num'] = df['hike_for_fun_num'].fillna(0).astype(int)
+# Create a pivot table of Device_Group and hike_for_fun_num
+pivot_table_devicegroup_hike_for_fun_num = df.pivot_table(index='Device_Group', columns='hike_for_fun_num', aggfunc='size', fill_value=0)
+print('Pivot table of Device_Group and hike_for_fun_num:')
+print(pivot_table_devicegroup_hike_for_fun_num)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stats, p_values = ttest_ind(
+    pivot_table_devicegroup_hike_for_fun_num.loc['Few (≤3)'],
+    pivot_table_devicegroup_hike_for_fun_num.loc['Many (≥4)'],
+    equal_var=False
+)
+# Determine significance based on p-value
+significance = p_values < alpha
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stats:.2f}")
+print(f"p-value: {p_values:.4f}")
+print("Significant difference:", significance)
+# Summary statistics for each group
+summary_stats = pivot_table_devicegroup_hike_for_fun_num.T.describe()
+display(summary_stats)
