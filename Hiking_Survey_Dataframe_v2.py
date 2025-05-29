@@ -4025,6 +4025,76 @@ display(headphones_audio_table)
 
 print('\n\n ---- end of headphones and audio app correlation ----\n\n\n')
 
+print('\n\n ---- Portable charger/battery and maps correlation ----\n')
+# Create a pivot table of Portable charger/battery and Maps
+if 'Maps' not in df.columns:
+    df['Maps'] = df['Apps'].str.contains('maps', case=False)
+    df['Maps'] = df['Maps'].map({True: 'Maps', False: 'No Maps'})
+    
+# Create a pivot table of Portable charger/battery and Maps
+df['Portable charger/battery'] = df['combined'].str.contains('Portable charger/battery', case=False)
+df['Portable charger/battery'] = df['Portable charger/battery'].map({True: 'Portable charger/battery', False: 'No Portable charger/battery'})
+pivot_table_portable_charger_maps = df.pivot_table(index='Portable charger/battery', columns='Maps', aggfunc='size', fill_value=0)
+print('Pivot table of Portable charger/battery and Maps:')
+print(pivot_table_portable_charger_maps)
+
+# Show the sum of all values in the pivot table
+print("Total in pivot table:", pivot_table_portable_charger_maps.values.sum())
+print("Expected total (number of rows in df):", len(df))
+
+# Chi-square test of independence: Portable charger/battery vs Maps
+alpha = 0.05
+chi2, p_value, _, _ = chi2_contingency(pivot_table_portable_charger_maps)
+print(f"Chi-squared statistic: {chi2:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+
+# Display a heatmap of the contingency table
+plt.figure(figsize=(5, 4))
+sns.heatmap(pivot_table_portable_charger_maps, annot=True, fmt='d', cmap='Blues')
+plt.title('Portable Charger/Battery vs Maps Usage')
+# plt.xlabel('Maps')
+# plt.ylabel('Portable Charger/Battery')
+plt.tight_layout()
+plt.show()
+
+print('\n\n ---- end of Portable charger/battery and maps correlation ----\n\n\n')
+
+print('\n\n ---- Smartwatch and maps correlation ----\n')
+# Create a pivot table of Smartwatch and Maps
+# Ensure 'Smart watch' column exists and is consistent
+if 'Smart watch' not in df.columns:
+    df['Smart watch'] = df['combined'].str.contains('smart watch', case=False)
+    df['Smart watch'] = df['Smart watch'].map({True: 'Smart watch', False: 'No Smart watch'})
+# Ensure 'Maps' column exists and is consistent
+df['Maps'] = df['Apps'].str.contains('maps', case=False)
+df['Maps'] = df['Maps'].map({True: 'Maps', False: 'No Maps'})
+pivot_table_smartwatch_maps = df.pivot_table(index='Smart watch', columns='Maps', aggfunc='size', fill_value=0)
+print('Pivot table of Smart watch and Maps:')
+print(pivot_table_smartwatch_maps)
+# Show the sum of all values in the pivot table
+print("Total in pivot table:", pivot_table_smartwatch_maps.values.sum())
+print("Expected total (number of rows in df):", len(df))
+# Chi-square test of independence: Smartwatch vs Maps
+alpha = 0.05
+chi2, p_value, _, _ = chi2_contingency(pivot_table_smartwatch_maps)
+print(f"Chi-squared statistic: {chi2:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+
+# Display a heatmap of the contingency table
+plt.figure(figsize=(5, 4))
+sns.heatmap(pivot_table_smartwatch_maps, annot=True, fmt='d', cmap='Blues')
+plt.title('Smartwatch vs Maps Usage')
+plt.xlabel('Maps')
+plt.ylabel('Smartwatch')
+plt.tight_layout()
+plt.show()
+
+print('\n\n ---- end of Smartwatch and maps correlation ----\n\n\n')
+
+
+
 
 
 print('\n\n\n ---- number of devices and preferences correlation ----\n')
@@ -4071,7 +4141,7 @@ print(f"p-value: {p_values:.4f}")
 print("Significant difference:", significance)
 # Summary statistics for each group
 summary_stats = pivot_table_devicegroup_easyhike_num.T.describe()
-display(summary_stats)
+# display(summary_stats)
 
 
 print('\n\n ---- Device_Group and difficult hike preference correlation ----\n')
@@ -4107,7 +4177,7 @@ print(f"p-value: {p_values:.4f}")
 print("Significant difference:", significance)
 # Summary statistics for each group
 summary_stats = pivot_table_devicegroup_difficult_hike_num.T.describe()
-display(summary_stats)
+# display(summary_stats)
 
 print('\n\n ---- Device_Group and hike for fun correlation ----\n')
 # Create a new column for hike_for_fun_num
@@ -4142,4 +4212,137 @@ print(f"p-value: {p_values:.4f}")
 print("Significant difference:", significance)
 # Summary statistics for each group
 summary_stats = pivot_table_devicegroup_hike_for_fun_num.T.describe()
-display(summary_stats)
+# display(summary_stats)
+
+print('\n\n ---- Device_Group and like_to_hike_alone correlation ----\n')
+# Create a new column for like_to_hike_alone_num
+if 'like_to_hike_alone_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['like_to_hike_alone_num'] = df['like_to_hike_alone'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['like_to_hike_alone_num'] = df['like_to_hike_alone_num'].fillna(0).astype(int)
+# Create a pivot table of Device_Group and like_to_hike_alone_num
+pivot_table_devicegroup_like_to_hike_alone_num = df.pivot_table(index='Device_Group', columns='like_to_hike_alone_num', aggfunc='size', fill_value=0)
+print('Pivot table of Device_Group and like_to_hike_alone_num:')
+print(pivot_table_devicegroup_like_to_hike_alone_num)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stats, p_values = ttest_ind(
+    pivot_table_devicegroup_like_to_hike_alone_num.loc['Few (≤3)'],
+    pivot_table_devicegroup_like_to_hike_alone_num.loc['Many (≥4)'],
+    equal_var=False
+)
+# Determine significance based on p-value
+significance = p_values < alpha
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stats:.2f}")
+print(f"p-value: {p_values:.4f}")
+print("Significant difference:", significance)
+# Summary statistics for each group
+summary_stats = pivot_table_devicegroup_like_to_hike_alone_num.T.describe()
+# display(summary_stats)
+
+print('\n\n ---- Device_Group and like_to_hike_in_group correlation ----\n')
+# Create a new column for like_to_hike_in_group_num
+if 'like_to_hike_in_group_num' not in df.columns:
+    mapping = {
+        'Strongly disagree': 1,
+        'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3,
+        'Somewhat agree': 4,
+        'Strongly agree': 5,
+    }
+    df['like_to_hike_in_group_num'] = df['like_to_hike_in_group'].replace(mapping).infer_objects(copy=False)
+    pd.set_option('future.no_silent_downcasting', True)
+    df['like_to_hike_in_group_num'] = df['like_to_hike_in_group_num'].fillna(0).astype(int)
+# Create a pivot table of Device_Group and like_to_hike_in_group_num
+pivot_table_devicegroup_like_to_hike_in_group_num = df.pivot_table(index='Device_Group', columns='like_to_hike_in_group_num', aggfunc='size', fill_value=0)
+print('Pivot table of Device_Group and like_to_hike_in_group_num:')
+print(pivot_table_devicegroup_like_to_hike_in_group_num)
+# Set significance level
+alpha = 0.05
+# Perform the t-test
+t_stats, p_values = ttest_ind(
+    pivot_table_devicegroup_like_to_hike_in_group_num.loc['Few (≤3)'],
+    pivot_table_devicegroup_like_to_hike_in_group_num.loc['Many (≥4)'],
+    equal_var=False
+)
+# Determine significance based on p-value
+significance = p_values < alpha
+# Print the t-statistic, p-value, significance, and summary statistics
+print(f"t-statistic: {t_stats:.2f}")
+print(f"p-value: {p_values:.4f}")
+print("Significant difference:", significance)
+# Summary statistics for each group
+summary_stats = pivot_table_devicegroup_like_to_hike_in_group_num.T.describe()
+# display(summary_stats)
+
+#display a table containing all the t_statistic, p-value, and significance for each of the above correlations
+
+print('\n\n ---- number of devices and preferences section ----\n\n\n')
+# Create a summary table for all the t-statistics, p-values, and significance
+# Calculate and store t-statistics and p-values for each correlation
+t_stat_easy_hike, p_value_easy_hike = ttest_ind(
+    pivot_table_devicegroup_easyhike_num.loc['Few (≤3)'],
+    pivot_table_devicegroup_easyhike_num.loc['Many (≥4)'],
+    equal_var=False
+)
+t_stat_difficult_hike, p_value_difficult_hike = ttest_ind(
+    pivot_table_devicegroup_difficult_hike_num.loc['Few (≤3)'],
+    pivot_table_devicegroup_difficult_hike_num.loc['Many (≥4)'],
+    equal_var=False
+)
+t_stat_hike_for_fun, p_value_hike_for_fun = ttest_ind(
+    pivot_table_devicegroup_hike_for_fun_num.loc['Few (≤3)'],
+    pivot_table_devicegroup_hike_for_fun_num.loc['Many (≥4)'],
+    equal_var=False
+)
+t_stat_like_to_hike_alone, p_value_like_to_hike_alone = ttest_ind(
+    pivot_table_devicegroup_like_to_hike_alone_num.loc['Few (≤3)'],
+    pivot_table_devicegroup_like_to_hike_alone_num.loc['Many (≥4)'],
+    equal_var=False
+)
+t_stat_like_to_hike_in_group, p_value_like_to_hike_in_group = ttest_ind(
+    pivot_table_devicegroup_like_to_hike_in_group_num.loc['Few (≤3)'],
+    pivot_table_devicegroup_like_to_hike_in_group_num.loc['Many (≥4)'],
+    equal_var=False
+)
+summary_table_devices = pd.DataFrame({
+    'Correlation': [
+        'Device_Group and easy hike preference',
+        'Device_Group and difficult hike preference',
+        'Device_Group and hike for fun',
+        'Device_Group and like to hike alone',
+        'Device_Group and like to hike in group'
+    ],
+    't-statistic': [
+        f"{t_stat_easy_hike:.2f}",
+        f"{t_stat_difficult_hike:.2f}",
+        f"{t_stat_hike_for_fun:.2f}",
+        f"{t_stat_like_to_hike_alone:.2f}",
+        f"{t_stat_like_to_hike_in_group:.2f}"
+    ],
+    'p-value': [
+        f"{p_value_easy_hike:.4f}",
+        f"{p_value_difficult_hike:.4f}",
+        f"{p_value_hike_for_fun:.4f}",
+        f"{p_value_like_to_hike_alone:.4f}",
+        f"{p_value_like_to_hike_in_group:.4f}"
+    ],
+    'Significant': [
+        p_value_easy_hike < alpha,
+        p_value_difficult_hike < alpha,
+        p_value_hike_for_fun < alpha,
+        p_value_like_to_hike_alone < alpha,
+        p_value_like_to_hike_in_group < alpha
+    ]
+})
+display(summary_table_devices)
+
