@@ -8,13 +8,17 @@ from scipy.stats import chi2_contingency
 from scipy.stats import chi2
 from statsmodels.stats.proportion import proportions_ztest
 from statsmodels.stats.multitest import fdrcorrection
+from statsmodels.stats.weightstats import ztest
+from statsmodels.stats.proportion import proportion_confint
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
 from IPython.display import display
 from scipy.stats import skew, kurtosis
 import matplotlib.patches as mpatches
 import seaborn as sns
 from skimpy import skim 
 
-display("---------------- Apps ---------/n")
+display("---------------- Apps ---------\n")
 # Load only Sheet 2
 df = pd.read_excel("hiking_data_v2.xlsx", sheet_name="AppUpdate")
 
@@ -4346,3 +4350,31 @@ summary_table_devices = pd.DataFrame({
 })
 display(summary_table_devices)
 
+
+
+print('\n\n ---- ttest of Gender and number of devices correlation ----\n')
+# Create a pivot table of Gender and number of devices 
+# Create a pivot table of Gender and number of devices
+pivot_table_gender_devices = df[df['Gender'].isin(['Male', 'Female'])].pivot_table(index='Gender', columns='number _of_devices', aggfunc='size', fill_value=0)
+print(pivot_table_gender_devices)
+
+# create a ttest for the above pivot table
+alpha = 0.05
+
+# Perform the t-test
+
+
+
+# For t-test, we need two groups. Let's compare the number of devices for Male vs Female as arrays
+male_counts = df[df['Gender'] == 'Male']['number _of_devices'].dropna()
+female_counts = df[df['Gender'] == 'Female']['number _of_devices'].dropna()
+# print("male count", male_counts)
+# print("female count", female_counts)
+
+t_stat, p_value = stats.ttest_ind(male_counts, female_counts, equal_var=False)
+print(f"t-statistic: {t_stat:.2f}")
+print(f"p-value: {p_value:.4f}")
+print("Significant difference:", p_value < alpha)
+
+
+print('\n\n ---- end of ttest of Gender and number of devices correlation ----\n\n\n')
