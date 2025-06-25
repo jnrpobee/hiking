@@ -1,185 +1,198 @@
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import scipy.stats as stats
+import matplotlib.pyplot as plt
+import numpy as np
 from scipy.stats import ttest_ind, chi2_contingency
-from statsmodels.stats.proportion import proportions_ztest, proportion_confint
+from statsmodels.stats.proportion import proportions_ztest
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
 from IPython.display import display
 import matplotlib.patches as mpatches
-import warnings
+import seaborn as sns
 import textwrap
 
-# Suppress specific warnings for cleaner output
-warnings.filterwarnings("ignore", category=FutureWarning)
+# Helper functions
+def create_bar_plot(data, title, filename, figsize=(10, 6)):
+    """Create standardized bar plot with labels and save"""
+    plt.figure(figsize=figsize)
+    colors = plt.cm.tab20(range(len(data)))
+    ax = data.plot(kind='bar', color=colors, width=0.95)
+    plt.xlabel('')
+    plt.ylabel('Count')
+    plt.title(title)
+    
+    #legend with custom colors and labels
+    labels = data.index
+    legend_patches = [mpatches.Patch(color=c, label=l) for c, l in zip(colors, labels)]
+    plt.legend(handles=legend_patches, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=2)
 
-display("---------------- Apps ---------\n")
-# Load only Sheet 2
-df = pd.read_excel("hiking_data_v3.xlsx", sheet_name="AppUpdate")
+    # Add data labels
+    for p in ax.patches:
+        plt.text(p.get_x() + p.get_width()/2, p.get_height() * 1.005, 
+                f'{p.get_height():.0f}', ha='center', fontsize=11, color='black')
+    
+    plt.xticks([])
+    plt.tight_layout()
+    plt.savefig(f'v3_copy/{filename}.png', bbox_inches='tight', dpi=300)
+    plt.show()
 
-display(df.head())  # Display first few rows
+def create_numeric_mapping(df, column, new_column):
+    """Create numeric mapping for Likert scale responses"""
+    mapping = {
+        'Strongly disagree': 1, 'Somewhat disagree': 2,
+        'Neither agree nor disagree': 3, 'Somewhat agree': 4, 'Strongly agree': 5
+    }
+    df[new_column] = df[column].replace(mapping).fillna(0).astype(int)
+    return df
 
-# Count the number of apps in each column
-# Ensure all columns are of string type before applying value_counts
-app_counts_per_column = df.astype(str).apply(pd.Series.value_counts).fillna(0).astype(int)
-app_counts_per_column = app_counts_per_column.loc[~app_counts_per_column.index.str.lower().str.contains('nan')]
-print('\n-----------------app counts per column------------------')
-display(app_counts_per_column)
-# Count the number of apps in each column and sum them up
-# Sum the number of usage of an app in each row
-total_app_counts_per_row = app_counts_per_column.sum(axis=1)
-print('\n-----------------total app counts per row------------------')
-display(total_app_counts_per_row)
+def perform_ttest_analysis(df, group_col, value_col, group1, group2):
+    """Perform t-test between two groups and return results"""
+    pivot = df.pivot_table(index=group_col, columns=value_col, aggfunc='size', fill_value=0)
+    t_stat, p_value = ttest_ind(pivot.loc[group1], pivot.loc[group2], equal_var=False)
+    return t_stat, p_value, p_value < 0.05
 
+def save_summary_table(summary_df, filename):
+    """Save summary table as PNG"""
+    plt.figure(figsize=(12, len(summary_df) * 0.5))
+    ax = plt.gca()
+    ax.axis('off')
+    table = plt.table(cellText=summary_df.values, colLabels=summary_df.columns,
+                     cellLoc='center', loc='center')
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    plt.tight_layout()
+    plt.savefig(f'v3_copy/{filename}.png', bbox_inches='tight', dpi=300)
+    plt.close()
 
-# Get the top 4 most common Apps
-top_apps = total_app_counts_per_row.nlargest(13)
+# Apps Analysis
+display("Apps Analysis")
+df_apps = pd.read_excel("hiking_data_v3.xlsx", sheet_name="AppUpdate")
+app_counts = df_apps.astype(str).apply(pd.Series.value_counts).fillna(0).astype(int)
+app_counts = app_counts.loc[~app_counts.index.str.lower().str.contains('nan')]
+total_app_counts = app_counts.sum(axis=1)
+top_apps = total_app_counts.nlargest(13)
 
-# Create a bar graph
-plt.figure(figsize=(8, 4.5))
-colors = plt.cm.tab20(range(len(top_apps)))
-# sns.set_palette("tab20")  # Set the color palette to tab10
-ax = top_apps.plot(kind='bar', color=colors, width=0.95)  # Increase width to reduce distance between bars
-plt.xlabel('Apps')
-plt.ylabel('App Count')
-# plt.title('Frequently Used Apps')
-labels = top_apps.index
-legend_patches = [plt.Rectangle((0,0),1,1,fc=color, edgecolor='none') for color in colors]
-plt.legend(legend_patches, top_apps.index, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=4)
-# Add data labels to the bars
-for p in ax.patches:
-    plt.text(p.get_x() + p.get_width()/2, p.get_height() * 1.005, '{}'.format(p.get_height()), ha='center', fontsize=11, color='black')
-plt.xticks([])
-# save the plot as an image 
-plt.savefig('hsd_v3/top_apps.png', bbox_inches='tight', dpi=300)
-#display saved image
-plt.show()
+create_bar_plot(top_apps, 'Frequently Used Apps', 'top_apps')
 
+# Device Analysis
+display("Device Analysis")
+df_devices = pd.read_excel('hiking_data_v3.xlsx', sheet_name='DevicesUpdate')
+device_counts = df_devices.drop(columns=['Count'], errors='ignore').astype(str).apply(pd.Series.value_counts).fillna(0).astype(int)
+device_counts = device_counts.loc[~device_counts.index.str.lower().str.contains('nan')]
+total_device_counts = device_counts.sum(axis=1)
+top_devices = total_device_counts.nlargest(13)
 
-print(' ---- trial with seaborn on the apps -----------')
-#create a bar chart of the top 4 apps
-plt.figure(figsize=(10, 6))
-sns.barplot(
-    x=top_apps.index,
-    y=top_apps.values,
-    hue=top_apps.index,  # Assign x variable to hue
-    palette='tab10',
-    legend=False
-)
-plt.xlabel('Apps')
-plt.ylabel('App Count')
-plt.title('Apps')
-for p in plt.gca().patches:
-    plt.text(p.get_x() + p.get_width()/2, p.get_height() * 1.005, '{:.0f}'.format(p.get_height()), ha='center', fontsize=11, color='black')
-plt.xticks(rotation=0)
-plt.tight_layout()
-plt.savefig('hsd_v3/top_apps_seaborn.png', bbox_inches='tight', dpi=300)
-plt.show()
+create_bar_plot(top_devices, 'Frequently Used Devices', 'top_devices')
 
-print('--------end of trial with seaborn on the apps -----------')
+# Device Combinations Analysis
+for num_devices in [2, 3]:
+    df_combo = pd.read_excel('hiking_data_v3.xlsx', sheet_name=f'{num_devices}devices.1')
+    device_cols = [f'device{i}' for i in range(1, num_devices + 1)]
+    df_combo[f'{num_devices}devices'] = df_combo[device_cols].apply(lambda x: ', '.join(x.dropna()), axis=1)
+    combo_counts = df_combo[f'{num_devices}devices'].value_counts()
+    create_bar_plot(combo_counts.head(7), f'{num_devices} Device Combinations', f'device_{num_devices}_combination')
 
-print( '-----------------app counts in percentage------------------')
-# Convert the app_counts_per_column to percentage (app_counts_per_column / number of respondants * 100)
-app_counts_percentage = total_app_counts_per_row / len(df) * 100
-app_counts_percentage = app_counts_percentage.round(1).astype(str) + '%'
-display(app_counts_percentage)
-display('len(df)', len(df))
-# display('df', df)
+# Main Survey Analysis
+df = pd.read_excel('hiking_data_v3.xlsx', sheet_name='Edit(2)')
 
-print("---------------- end of apps -----------\n\n")
-print("---------------- start of device combination -----------\n\n")
+# Gender distribution
+gender_counts = df['Gender'].value_counts()
+display("Gender Distribution:", gender_counts)
 
-df = pd.read_excel('hiking_data_v3.xlsx', sheet_name='DevicesUpdate')
+# Hiking frequency analysis
+frequency_mapping = {'Once a month': 12, '2-3 times per year': 2.5, 
+                    'Once a week': 52, 'Once a year': 1, 'Never': 0}
+df['hiking_duration_numeric'] = df['hiking_duration'].replace(frequency_mapping)
 
+# Device count analysis
+device_counts_dist = df['number _of_devices'].value_counts().sort_index()
+create_bar_plot(device_counts_dist, 'Distribution of Devices', 'device_counts')
 
-# display(df.head())  # Display first few rows
+# Create device groups
+df['Device_Group'] = np.where(df['number _of_devices'] <= 3, 'Few (≤3)', 'Many (≥4)')
 
-# device_counts_per_column = df.astype(str).apply(pd.Series.value_counts).fillna(0).astype(int)
-device_counts_per_column = df.drop(columns=['Count'], errors='ignore').astype(str).apply(pd.Series.value_counts).fillna(0).astype(int)
-device_counts_per_column = device_counts_per_column.loc[~device_counts_per_column.index.str.lower().str.contains('nan')]
+# Create binary device/app indicators
+device_apps = {
+    'Headphones': 'headphones/earbuds',
+    'Smart_Watch': 'smart watch',
+    'Portable_Charger': 'Portable charger/battery',
+    'Maps': 'maps',
+    'Camera': 'camera',
+    'Audio': 'audio',
+    'Text_Messaging': 'text messaging'
+}
 
-total_device_counts_per_row = device_counts_per_column.sum(axis=1)
+for key, value in device_apps.items():
+    if key in ['Maps', 'Camera', 'Audio', 'Text_Messaging']:
+        df[key] = df['Apps'].str.contains(value, case=False).map({True: key, False: f'No {key}'})
+    else:
+        df[key] = df['combined'].str.contains(value, case=False).map({True: key, False: f'No {key}'})
 
-#devices carried by the participants
-top_devices = total_device_counts_per_row.nlargest(13)
-display('top devices', top_devices)
+# Preference mappings
+preferences = ['hike_for_mediation', 'like_to_hike_alone', 'like_to_hike_in_group',
+              'hike_for_social_interaction', 'hike_for_less_than_a_day', 'hike_for_multiple_days',
+              'like_to_hike_near_home', 'hike_while_traveling', 'hike_for_less_than_1hour',
+              'hike_for_health', 'easy_hike', 'difficult_hike', 'hike_for_fun']
 
-#percentage of devices in the top_devices
-top_devices_percentage = total_device_counts_per_row.nlargest(13) / len(df) * 100
-top_devices_percentage = top_devices_percentage.round(1).astype(str) + '%'
-display('top devices percentage', top_devices_percentage)
+for pref in preferences:
+    if pref in df.columns:
+        df = create_numeric_mapping(df, pref, f'{pref}_num')
 
-# Create a bar graph
-plt.figure(figsize=(10, 6))
-colors = plt.cm.tab20(range(len(top_devices)))
-top_devices.plot(kind='bar', color=colors, width=0.95)
-plt.xlabel('Devices')
-plt.ylabel('Device Count')
-# plt.title('Frequently Used Devices')
-labels = top_devices.index
-legend_patches = [plt.Rectangle((0,0),1,1,fc=color, edgecolor='none') for color in colors]
-plt.legend(legend_patches, top_devices.index, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=2)  # Adjusted bbox_to_anchor to remove white space
-for p in plt.gca().patches:
-    plt.text(p.get_x() + p.get_width()/2, p.get_height() * 1.005, '{}'.format(p.get_height()), ha='center', fontsize=11, color='black')
-plt.xticks([])
-plt.savefig('hsd_v3/top_devices.png', bbox_inches='tight', dpi=300)
-plt.show()
+# Statistical Analysis - Device vs Preferences
+device_pref_tests = []
+test_pairs = [
+    ('Headphones', 'hike_for_mediation_num'),
+    ('Headphones', 'like_to_hike_in_group_num'),
+    ('Headphones', 'like_to_hike_alone_num'),
+    ('Portable_Charger', 'hike_for_less_than_a_day_num'),
+    ('Portable_Charger', 'hike_for_multiple_days_num')
+]
 
-# print('\n-----------------device counts per column------------------')
-# display(device_counts_per_column)
+for device, preference in test_pairs:
+    t_stat, p_val, significant = perform_ttest_analysis(df, device, preference, device, f'No {device}')
+    device_pref_tests.append({
+        'Test': f'{device} vs {preference}',
+        't-statistic': f'{t_stat:.2f}',
+        'p-value': f'{p_val:.4f}',
+        'Significant': significant
+    })
 
-print('\n-----------------device 2 combination------------------')
-df = pd.read_excel('hiking_data_v3.xlsx', sheet_name='2devices.1')
+device_summary = pd.DataFrame(device_pref_tests)
+save_summary_table(device_summary, 'device_preferences_summary')
+display(device_summary)
 
-# combine device1 and device2 columns into a new column called 2devices
-df['2devices'] = df['device1'] + ', ' + df['device2']
+# Chi-square tests for device-app correlations
+chi_square_tests = []
+chi_pairs = [
+    ('Headphones', 'Audio'),
+    ('Portable_Charger', 'Maps'),
+    ('Smart_Watch', 'Maps'),
+    ('Smart_Watch', 'Audio')
+]
 
-# remove the leading and trailing spaces from the new column
-df['2devices'] = df['2devices'].str.strip()
+for device, app in chi_pairs:
+    contingency = df.pivot_table(index=device, columns=app, aggfunc='size', fill_value=0)
+    chi2, p_val, _, _ = chi2_contingency(contingency)
+    chi_square_tests.append({
+        'Test': f'{device} vs {app}',
+        'Chi-square': f'{chi2:.2f}',
+        'p-value': f'{p_val:.4f}',
+        'Significant': p_val < 0.05
+    })
 
-# display(df.head())  # Display first few rows
+chi_summary = pd.DataFrame(chi_square_tests)
+save_summary_table(chi_summary, 'device_app_correlations')
+display(chi_summary)
 
-# Count the number of devices in 2devices column
-device_2_counts = df['2devices'].value_counts()
-# display(device_2_counts)
+# Gender analysis
+gender_filtered = df[df['Gender'].isin(['Male', 'Female'])]
+male_devices = gender_filtered[gender_filtered['Gender'] == 'Male']['number _of_devices'].dropna()
+female_devices = gender_filtered[gender_filtered['Gender'] == 'Female']['number _of_devices'].dropna()
 
-#percentage of devices in the 2devices column
-device_2_percentage = df['2devices'].value_counts(normalize=True) * 100
-device_2_percentage = device_2_percentage.round(1).astype(str) + '%'
-display('2 device combinaiton', device_2_percentage.round(1))
+t_stat, p_value = ttest_ind(male_devices, female_devices, equal_var=False)
+display(f"Gender vs Device Count - t-stat: {t_stat:.2f}, p-value: {p_value:.4f}, Significant: {p_value < 0.05}")
 
-# Create a bar graph of the counts in the 2devices column
-
-plt.figure(figsize=(10, 6))
-device_2_colors = plt.cm.tab20(range(len(device_2_counts)))  # Use a colormap for consistent coloring
-device_2_counts.plot(kind='bar', color=device_2_colors, width=0.95)  # Increase width to reduce distance between bars
-plt.xlabel('Device Combinations')
-plt.ylabel('Device Count')
-# plt.title('Device Count in 2devices Column')
-legend_patches = [plt.Rectangle((0,0),1,1,fc=color, edgecolor='none') for color in device_2_colors]
-plt.legend(legend_patches, device_2_counts.index, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=2)  # Adjusted bbox_to_anchor to remove white space
-# Add data labels to the bars
-for p in plt.gca().patches:
-    plt.text(p.get_x() + p.get_width()/2, p.get_height() * 1.005, '{}'.format(p.get_height()), ha='center', fontsize=11, color='black')
-plt.xticks([])
-plt.savefig('hsd_v3/device_2_combination.png', bbox_inches='tight', dpi=300)
-plt.show()
-
-print('\n -----------------devices in 2 device combination------------------')
-df = pd.read_excel('hiking_data_v3.xlsx', sheet_name='2devCount.1')
-
-# display(df.head())  # Display first few rows
-
-# Count the number of devices in the '2_Devices' column
-deviceTwo_counts = df['Two_Devices'].value_counts()
-# display('device 2 count', deviceTwo_counts)
-
-# percentage of devices in the 2devices column
-deviceTwo_percentage = df['Two_Devices'].value_counts(normalize=True) * 100
-deviceTwo_percentage = deviceTwo_percentage.round(1).astype(str) + '%'
-display('devices in 2 device combination',deviceTwo_percentage.round(1))
-
-plt.figure(figsize=(8, 5))
+print("Analysis Complete")
 device2CountColors = plt.cm.tab20(range(len(device_2_counts)))  # Use a colormap for consistent coloring
 deviceTwo_counts.plot(kind='bar', color=device2CountColors, width=0.90)  # Increase width to reduce distance between bars
 plt.xlabel('Devices')
