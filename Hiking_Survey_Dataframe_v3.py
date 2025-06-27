@@ -17,8 +17,6 @@ display("---------------- Apps ---------\n")
 # Load only Sheet 2
 df = pd.read_excel("hiking_data_v3.xlsx", sheet_name="AppUpdate")
 
-display(df.head())  # Display first few rows
-
 # Count the number of apps in each column
 # Ensure all columns are of string type before applying value_counts
 app_counts_per_column = df.astype(str).apply(pd.Series.value_counts).fillna(0).astype(int)
